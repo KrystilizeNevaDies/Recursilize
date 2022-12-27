@@ -1,6 +1,7 @@
 plugins {
     java
     `java-library`
+    `maven-publish`
 }
 
 // subprojects
@@ -8,6 +9,7 @@ subprojects {
 
     plugins.apply("java")
     plugins.apply("java-library")
+    plugins.apply("maven-publish")
 
     group = "org.example"
     version = "1.0-SNAPSHOT"
