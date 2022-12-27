@@ -7,6 +7,8 @@ import org.krystilize.recursilize.Visitor;
 import java.util.function.Function;
 
 public interface RecursilizeTree<T> extends Visitable<T> {
+
+    // Unfortunately, using min and max int value causes stack overflow...
     int COORD_MIN = -536_870_912;
     int COORD_MAX = 536_870_912;
 
@@ -93,6 +95,7 @@ public interface RecursilizeTree<T> extends Visitable<T> {
          * @param y     the y coordinate
          * @param z     the z coordinate
          * @param value the value to set
+         * @return true if the tree changed as a result of this call, false otherwise
          */
         boolean set(int x, int y, int z, T value);
 
@@ -106,10 +109,11 @@ public interface RecursilizeTree<T> extends Visitable<T> {
         }
     }
 
-    // TODO: Make this javadoc better, explain how the equality comparison works
-
     /**
-     * Compares the two given trees for equality.
+     * Compares the two given trees for equality. This implementation does so by comparing every level of the tree with
+     * the other tree, and if any level is not equal, the trees are not equal.
+     * Level comparison entails that both level's objects are either equal according to {@link Object#equals(Object)} or
+     * if the level's object is another level, the two levels are compared recursively.
      *
      * @param a The first tree.
      * @param b The second tree.
@@ -119,14 +123,19 @@ public interface RecursilizeTree<T> extends Visitable<T> {
         return TreeSector.deepEquals(a.root(), b.root());
     }
 
-    static String toString(RecursilizeTree<?> world) {
-        return toString(world, Object::toString);
+    /**
+     * Converts this tree into a string representation.
+     * @param tree The tree to convert.
+     * @return A string representation of the tree.
+     */
+    static String toString(RecursilizeTree<?> tree) {
+        return toString(tree, Object::toString);
     }
 
-    static <T> String toString(RecursilizeTree<T> world, Function<T, String> toString) {
+    static <T> String toString(RecursilizeTree<T> tree, Function<T, String> toString) {
         StringBuilder sb = new StringBuilder();
-        TreeSector.toString(world.root(), 0,
-                str -> sb.append(str), // .append('\n'),
+        TreeSector.toString(tree.root(), 0,
+                sb::append, // .append('\n'),
                 obj -> toString.apply((T) obj));
         return sb.toString();
     }

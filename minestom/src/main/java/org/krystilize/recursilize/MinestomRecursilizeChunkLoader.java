@@ -77,15 +77,9 @@ public final class MinestomRecursilizeChunkLoader implements IChunkLoader {
         int finalMaxX = maxX;
         int finalMaxY = maxY;
         int finalMaxZ = maxZ;
-        CompletableFuture<Void> future = new CompletableFuture<>();
-        CompletableFuture.allOf(futures)
-            .thenRun(() -> {
-                entryLoader.save(finalMinX, finalMinY, finalMinZ, finalMaxX, finalMaxY, finalMaxZ).thenRun(() -> {
-                    System.out.println("Chunks written to file.");
-                    future.complete(null);
-                });
-            });
-        return future;
+        return CompletableFuture.allOf(futures)
+                .thenCompose((ignored) -> entryLoader.save(finalMinX, finalMinY, finalMinZ, finalMaxX, finalMaxY, finalMaxZ))
+                .thenRun(() -> System.out.println("Saved " + saved.get() + " chunks"));
     }
 
     @Override
@@ -105,19 +99,14 @@ public final class MinestomRecursilizeChunkLoader implements IChunkLoader {
                 for (int y = minY; y < maxY; y++) {
                     for (int z = minZ; z < maxZ; z++) {
                         Block block = section.get(x, y, z);
-                        if (block != null) {
+                        if (block != null && !Block.AIR.compare(block)) {
                             chunk.setBlock(x, y, z, block);
-                        }
-
-                        if (Block.COBBLESTONE.compare(block)) {
-                            System.out.println("Found cobblestone at " + x + ", " + y + ", " + z);
                         }
                     }
                 }
             }
 
             System.out.println("Loaded chunk " + chunkX + ", " + chunkZ);
-
             return chunk;
         });
     }
@@ -150,7 +139,7 @@ public final class MinestomRecursilizeChunkLoader implements IChunkLoader {
 
     public static final BinarySerializer<Block> BLOCK_SERIALIZER = new BinarySerializer<>() {
         @Override
-        public void write(Block block, BitOutput output) throws IOException {
+        public void write(BitOutput output, Block block) throws IOException {
             String namespace = block.namespace().toString();
             Map<String, String> properties = block.properties();
 

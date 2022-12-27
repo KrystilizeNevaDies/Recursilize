@@ -74,15 +74,18 @@ class RecursivePaletteFormat {
             //noinspection unchecked
             int[] localPaletteAdditions = multi.sectors()
                     .stream()
-                    .filter(s -> !(s instanceof TreeSector))
+                    .filter(sect -> !(sect instanceof TreeSector))
                     .map(entry -> (T) entry)
                     .distinct()
                     .map(global::getInt)
                     .mapToInt(Objects::requireNonNull)
                     .filter(index -> !local.contains(index))
-                    .peek(local::addGeneric)
+                    .sorted()
                     .toArray();
 
+            for (int addition : localPaletteAdditions) {
+                local.addGeneric(addition);
+            }
 
             // Write the local palette additions
             Utils.writeIntList(output, localPaletteAdditions, (out, index) -> {
@@ -136,7 +139,7 @@ class RecursivePaletteFormat {
         Palette<T> globalPalette = Palette.from(Utils.readList(input, reader));
 
         // Tree root
-        TreeSector sector = (TreeSector) readSector(input, globalPalette, new Palette<>());
+        Object root = readSector(input, globalPalette, new Palette<>());
 
         if (xMin != RecursilizeTree.COORD_MIN || yMin != RecursilizeTree.COORD_MIN || zMin != RecursilizeTree.COORD_MIN) {
             throw new IOException("Unsupported world size");
@@ -146,7 +149,8 @@ class RecursivePaletteFormat {
             throw new IOException("Unsupported world size");
         }
 
-        return RecursilizeTree.from(sector);
+        TreeSector rootSector = root instanceof TreeSector rootSector1 ? rootSector1 : new TreeSectorImpl(root);
+        return RecursilizeTree.from(rootSector);
     }
 
     private static <T> Object readSector(BitInput input,
@@ -203,9 +207,9 @@ class RecursivePaletteFormat {
         private final List<T> entries = new ArrayList<>();
         private final Map<T, Integer> entryMap = new HashMap<>();
 
-        public static <T> Palette<T> from(List<T> readList) {
+        public static <T> Palette<T> from(List<T> list) {
             Palette<T> palette = new Palette<>();
-            for (T t : readList)
+            for (T t : list)
                 palette.addGeneric(t);
             return palette;
         }
@@ -250,6 +254,13 @@ class RecursivePaletteFormat {
             int index = entryMap.remove(entry);
             entries.remove(index);
             return index;
+        }
+
+        @Override
+        public String toString() {
+            return "Palette{" +
+                    "entries=" + entries +
+                    '}';
         }
     }
 }

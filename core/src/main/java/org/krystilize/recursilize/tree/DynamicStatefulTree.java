@@ -43,6 +43,7 @@ public class DynamicStatefulTree<T> implements RecursilizeTree.Dynamic<T> {
             return false;
         }
 
+        // Otherwise create the new stateful section
         // Otherwise, we need to create a new stateful section and continue the internal set calls
         int newMinX = section.minX + (xSmall ? 0 : section.dx() / 2);
         int newMinY = section.minY + (ySmall ? 0 : section.dy() / 2);
@@ -150,18 +151,37 @@ public class DynamicStatefulTree<T> implements RecursilizeTree.Dynamic<T> {
 
 
         public boolean set(boolean xSmall, boolean ySmall, boolean zSmall, Object sector) {
-            int key = (xSmall ? 1 : 0) | (ySmall ? 2 : 0) | (zSmall ? 4 : 0);
-            Object old = switch (key) {
-                case 0 -> {Object oldVal = xnynzn; xnynzn = sector; yield oldVal;}
-                case 1 -> {Object oldVal = xpynzn; xpynzn = sector; yield oldVal;}
-                case 2 -> {Object oldVal = xnypzn; xnypzn = sector; yield oldVal;}
-                case 3 -> {Object oldVal = xpypzn; xpypzn = sector; yield oldVal;}
-                case 4 -> {Object oldVal = xnynzp; xnynzp = sector; yield oldVal;}
-                case 5 -> {Object oldVal = xpynzp; xpynzp = sector; yield oldVal;}
-                case 6 -> {Object oldVal = xnypzp; xnypzp = sector; yield oldVal;}
-                case 7 -> {Object oldVal = xpypzp; xpypzp = sector; yield oldVal;}
-                default -> throw new IllegalStateException("Unexpected value: " + key);
-            };
+            Object old;
+            if (zSmall) {
+                if (ySmall) {
+                    if (xSmall) {
+                        old = xnynzn; xnynzn = sector;
+                    } else {
+                        old = xpynzn; xpynzn = sector;
+                    }
+                } else {
+                    if (xSmall) {
+                        old = xnypzn; xnypzn = sector;
+                    } else {
+                        old = xpypzn; xpypzn = sector;
+                    }
+                }
+            } else {
+                if (ySmall) {
+                    if (xSmall) {
+                        old = xnynzp; xnynzp = sector;
+                    } else {
+                        old = xpynzp; xpynzp = sector;
+                    }
+                } else {
+                    if (xSmall) {
+                        old = xnypzp; xnypzp = sector;
+                    } else {
+                        old = xpypzp; xpypzp = sector;
+                    }
+                }
+            }
+
             return !Objects.equals(old, sector);
         }
     }

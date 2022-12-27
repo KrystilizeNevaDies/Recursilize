@@ -24,7 +24,7 @@ public class TestDynamicImpl {
 
         Random random = new Random(0);
 
-        int count = 5120000;
+        long count = 512000;
         long start = System.nanoTime();
         int cubeRoot = (int) Math.cbrt(count);
 
@@ -65,7 +65,6 @@ public class TestDynamicImpl {
         }
 
         RecursilizeTree<String> copy = RecursilizeTree.copyOf(world);
-
         assertTrue(RecursilizeTree.equals(world, copy));
     }
 

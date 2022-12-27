@@ -37,9 +37,9 @@ public interface MinecraftBlock {
                 properties().equals(other.properties());
     }
 
-    static void write(MinecraftBlock block, BitOutput output) throws IOException {
+    static void write(BitOutput output, MinecraftBlock block) throws IOException {
         Utils.UTF_8_WRITER.write(output, block.namespace());
-        Utils.writeList(output, new ArrayList<>(block.properties().entrySet()), (e, o) -> {
+        Utils.writeList(output, new ArrayList<>(block.properties().entrySet()), (o, e) -> {
             Utils.UTF_8_WRITER.write(o, e.getKey());
             Utils.UTF_8_WRITER.write(o, e.getValue());
         });
@@ -64,8 +64,8 @@ public interface MinecraftBlock {
         }
 
         @Override
-        public void write(MinecraftBlock value, BitOutput output) throws IOException {
-            MinecraftBlock.write(value, output);
+        public void write(BitOutput output, MinecraftBlock value) throws IOException {
+            MinecraftBlock.write(output, value);
         }
     };
 }

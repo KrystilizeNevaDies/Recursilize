@@ -3,3 +3,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":platform-api"))
 }
+
+tasks.withType(Test::class.java) {
+    useJUnitPlatform()
+}

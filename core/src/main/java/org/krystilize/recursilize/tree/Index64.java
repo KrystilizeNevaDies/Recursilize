@@ -210,7 +210,7 @@ public class Index64 {
     }
 
     public void set(int key, Object obj) {
-        switch(key) {
+        switch (key) {
             case INDEX_XNN_YNN_ZNN -> XNN_YNN_ZNN = obj;
             case INDEX_XPN_YNN_ZNN -> XPN_YNN_ZNN = obj;
             case INDEX_XNP_YNN_ZNN -> XNP_YNN_ZNN = obj;
@@ -292,6 +292,6 @@ public class Index64 {
             case INDEX_XPP_YPP_ZPP -> XPP_YPP_ZPP = obj;
 
             default -> throw new IllegalStateException("Unexpected value: " + key);
-        };
+        }
     }
 }

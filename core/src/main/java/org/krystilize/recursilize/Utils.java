@@ -40,7 +40,7 @@ public class Utils {
     public static <T> void writeList(BitOutput output, List<T> entries, ObjectWriter<T> writer) throws IOException {
         output.writeUnsignedLong(32, entries.size());
         for (T entry : entries) {
-            writer.write(entry, output);
+            writer.write(output, entry);
         }
     }
 
