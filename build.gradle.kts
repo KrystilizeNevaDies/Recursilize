@@ -18,4 +18,17 @@ subprojects {
         mavenCentral()
         maven(url = "https://jitpack.io")
     }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>("mavenJava") {
+                from(components["java"])
+            }
+        }
+    }
 }
